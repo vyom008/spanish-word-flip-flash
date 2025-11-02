@@ -40,7 +40,7 @@ pipeline {
                 }
             }
             steps {
-                // sh 'npm ci'
+                sh 'npm ci'
                 // Integration tests with Playwright
                 sh 'npx playwright run'
             }
