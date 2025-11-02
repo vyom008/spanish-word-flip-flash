@@ -18,31 +18,34 @@ pipeline {
             }
         }
 
-        stage('unit tests') {
-            agent {
-                docker {
-                    image 'node:22-alpine'
-                    reuseNode true
+        stage('test') {
+            parallel {
+                stage('unit tests') {
+                    agent {
+                        docker {
+                            image 'node:22-alpine'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh 'npm ci'
+                        // Unit tests with Vitest
+                        sh 'npx vitest run --reporter=verbose'
+                    }
                 }
-            }
-            steps {
-                sh 'npm ci'
-                // Unit tests with Vitest
-                sh 'npx vitest run --reporter=verbose'
-            }
-        }
-
-        stage('integration tests') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
-                    reuseNode true
+                stage('integration tests') {
+                    agent {
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.54.2-jammy'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh 'npm ci'
+                        // Integration tests with Playwright
+                        sh 'npx playwright test'
+                    }
                 }
-            }
-            steps {
-                sh 'npm ci'
-                // Integration tests with Playwright
-                sh 'npx playwright run'
             }
         }
 
